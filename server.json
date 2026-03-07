@@ -1,0 +1,45 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.aarjay/memwright",
+  "version": "0.1.0",
+  "title": "Memwright",
+  "description": "Embedded memory for AI agents. SQLite + FTS5 full-text search, pgvector semantic search, and Neo4j entity graphs with multi-layer retrieval fusion.",
+  "websiteUrl": "https://github.com/aarjay/agent-memory",
+  "repository": {
+    "url": "https://github.com/aarjay/agent-memory"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "memwright[all]",
+      "transport": "stdio",
+      "packageArguments": ["serve", "./memory-store"],
+      "environmentVariables": [
+        {
+          "name": "PG_CONNECTION_STRING",
+          "description": "PostgreSQL connection string for pgvector (default: postgresql://memwright:memwright@localhost:5432/memwright)",
+          "required": false,
+          "secret": false
+        },
+        {
+          "name": "NEO4J_PASSWORD",
+          "description": "Neo4j database password (default: memwright)",
+          "required": false,
+          "secret": true
+        },
+        {
+          "name": "OPENROUTER_API_KEY",
+          "description": "OpenRouter API key for embeddings (required for semantic search)",
+          "required": false,
+          "secret": true
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "description": "OpenAI API key for embeddings (alternative to OpenRouter)",
+          "required": false,
+          "secret": true
+        }
+      ]
+    }
+  ]
+}

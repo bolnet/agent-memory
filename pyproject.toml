@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "memwright"
+version = "0.1.0"
+description = "Embedded memory for AI agents with SQLite, pgvector, and graph support."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.9"
+authors = [{ name = "aarjay" }]
+keywords = ["ai", "agent", "memory", "llm", "sqlite", "pgvector", "graph", "embedded"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/aarjay/agent-memory"
+Repository = "https://github.com/aarjay/agent-memory"
+Issues = "https://github.com/aarjay/agent-memory/issues"
+
+[project.optional-dependencies]
+vectors = ["psycopg[binary]>=3.2.0", "psycopg-pool>=3.2.0", "pgvector>=0.3.0", "openai>=1.0.0"]
+neo4j = ["neo4j>=5.0"]
+extraction = ["openai>=1.0.0"]
+mcp = ["mcp>=1.0.0"]
+production = [
+    "psycopg[binary]>=3.2.0", "psycopg-pool>=3.2.0", "pgvector>=0.3.0",
+    "openai>=1.0.0", "neo4j>=5.0",
+]
+all = [
+    "psycopg[binary]>=3.2.0", "psycopg-pool>=3.2.0", "pgvector>=0.3.0",
+    "openai>=1.0.0", "neo4j>=5.0",
+    "mcp>=1.0.0",
+]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.scripts]
+agent-memory = "agent_memory.cli:main"
+memwright = "agent_memory.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agent_memory"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+
+# Environment
+.env
+
+# Memory stores
+*.db
+graph.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Benchmark results
+*_results.json
+locomo_*.json
+
+# Accidental pip output files
+=*
