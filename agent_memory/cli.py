@@ -346,7 +346,7 @@ def _init_env(store_path: Path):
     if not env_file.exists():
         env_content = """\
 # Memwright configuration
-# See: https://github.com/aarjay/agent-memory
+# See: https://github.com/bolnet/agent-memory
 
 # PostgreSQL (pgvector) — matches docker-compose.yml defaults
 PG_CONNECTION_STRING=postgresql://memwright:memwright@localhost:5432/memwright

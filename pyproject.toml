@@ -26,9 +26,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/aarjay/agent-memory"
-Repository = "https://github.com/aarjay/agent-memory"
-Issues = "https://github.com/aarjay/agent-memory/issues"
+Homepage = "https://github.com/bolnet/agent-memory"
+Repository = "https://github.com/bolnet/agent-memory"
+Issues = "https://github.com/bolnet/agent-memory/issues"
 
 [project.optional-dependencies]
 vectors = ["psycopg[binary]>=3.2.0", "psycopg-pool>=3.2.0", "pgvector>=0.3.0", "openai>=1.0.0"]
