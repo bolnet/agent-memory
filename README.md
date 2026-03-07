@@ -1,5 +1,7 @@
 # Memwright
 
+mcp-name: io.github.bolnet/memwright
+
 Embedded memory for AI agents. SQLite + pgvector + Neo4j.
 
 `pip install memwright` — Python import: `from agent_memory import AgentMemory`
