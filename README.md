@@ -105,15 +105,15 @@ Multi-layer cascade with Reciprocal Rank Fusion:
 
 ```mermaid
 graph TD
-    Q["Query"] --> T["1. Tag Match<br/><small>&lt;1ms · SQL index</small>"]
-    Q --> F["2. FTS5 BM25<br/><small>1-3ms · Full-text</small>"]
-    Q --> G["3. Graph Expansion<br/><small>&lt;1ms · Neo4j multi-hop</small>"]
-    Q --> V["4. Vector Similarity<br/><small>5-10ms · pgvector cosine</small>"]
-    T --> R["RRF Fusion + Ranking"]
+    Q[Query] --> T["Tag Match · &lt;1ms"]
+    Q --> F["FTS5 BM25 · 1-3ms"]
+    Q --> G["Graph · Neo4j"]
+    Q --> V["Vector · pgvector"]
+    T --> R[RRF Fusion]
     F --> R
     G --> R
     V --> R
-    R --> O["Ranked Results<br/><small>within token budget</small>"]
+    R --> O[Ranked Results]
 
     style Q fill:#C15F3C,stroke:#C15F3C,color:#fff
     style R fill:#C15F3C,stroke:#C15F3C,color:#fff
