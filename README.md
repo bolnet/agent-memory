@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <em>Embedded memory for AI agents. Sub-5ms retrieval. Works with Claude Code.</em>
+  <em>Embedded memory for AI agents. No LLM cost per write. Works with Claude Code.</em>
 </p>
 
 <p align="center">
@@ -23,9 +23,10 @@
 
 AI agents forget everything between conversations. The typical fix is a managed vector database or cloud memory service. Memwright takes a different approach:
 
-- **Local-first** — A SQLite file with FTS5 full-text search. Your data stays on your machine.
-- **Fast** — 4-layer retrieval cascade returns results in under 5ms.
+- **No LLM cost per write** — Competitors call an LLM 3+ times per memory add. Memwright doesn't.
+- **Graph memory included** — Neo4j entity graph for multi-hop reasoning. Free, not paywalled.
 - **Token efficient** — 300-500 tokens per recall vs 15,000+ for full history replay.
+- **Fully local** — Your data stays on your machine. No cloud dependency.
 
 Works as a **Claude Code MCP server**, a **Cursor MCP server**, or a **Python library**.
 
@@ -105,12 +106,10 @@ Multi-layer cascade with Reciprocal Rank Fusion:
 
 ```mermaid
 graph TD
-    Q[Query] --> T["Tag Match · &lt;1ms"]
-    Q --> F["FTS5 BM25 · 1-3ms"]
+    Q[Query] --> T["Tag Match"]
     Q --> G["Graph · Neo4j"]
     Q --> V["Vector · pgvector"]
     T --> R[RRF Fusion]
-    F --> R
     G --> R
     V --> R
     R --> O[Ranked Results]
@@ -119,7 +118,6 @@ graph TD
     style R fill:#C15F3C,stroke:#C15F3C,color:#fff
     style O fill:#161b22,stroke:#C15F3C,color:#F4F3EE
     style T fill:#161b22,stroke:#30363d,color:#F4F3EE
-    style F fill:#161b22,stroke:#30363d,color:#F4F3EE
     style G fill:#161b22,stroke:#30363d,color:#F4F3EE
     style V fill:#161b22,stroke:#30363d,color:#F4F3EE
 ```
@@ -132,7 +130,7 @@ When the graph is enabled, entity relationships are traversed to find related me
 agent-memory init ./store              # Initialize store + Docker + .env
 agent-memory add ./store "text" ...    # Add a memory
 agent-memory recall ./store "query"    # Multi-layer recall
-agent-memory search ./store "text"     # FTS5 search
+agent-memory search ./store "text"     # Search memories
 agent-memory list ./store              # List memories
 agent-memory timeline ./store          # Entity timeline
 agent-memory stats ./store             # Store statistics
@@ -146,10 +144,10 @@ agent-memory import ./store bak.json
 
 ```
 AgentMemory
-├── SQLite + FTS5    — Core keyword search, always on
+├── SQLite           — Core storage, always on
 ├── pgvector         — Semantic vector search (PostgreSQL)
 ├── Neo4j            — Entity graph, multi-hop traversal
-├── Retrieval        — 4-layer cascade with RRF fusion
+├── Retrieval        — Multi-layer cascade with RRF fusion
 ├── Temporal         — Contradiction detection, supersession
 ├── Extraction       — Rule-based + optional LLM
 ├── MCP Server       — Claude Code / Cursor integration

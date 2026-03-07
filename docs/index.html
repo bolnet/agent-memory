@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Memwright — Embedded Memory for AI Agents</title>
-  <meta name="description" content="Give your AI agents persistent memory. Sub-5ms retrieval with SQLite FTS5, pgvector, and Neo4j. Works with Claude Code and Cursor.">
+  <meta name="description" content="Give your AI agents persistent memory. No LLM cost per write. pgvector + Neo4j graph. Works with Claude Code and Cursor.">
   <meta property="og:title" content="Memwright — Embedded Memory for AI Agents">
-  <meta property="og:description" content="Give your AI agents persistent memory. Sub-5ms retrieval. Works with Claude Code.">
+  <meta property="og:description" content="Give your AI agents persistent memory. No LLM cost per write. Works with Claude Code.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bolnet.github.io/agent-memory/">
   <link rel="stylesheet" href="style.css">
@@ -16,7 +16,7 @@
   <section class="hero">
     <div class="container">
       <img src="logo.svg" alt="Memwright" class="hero-logo" width="480" height="120">
-      <p class="tagline">Embedded memory for AI agents. Sub-5ms retrieval. Works with Claude Code.</p>
+      <p class="tagline">Embedded memory for AI agents. No LLM cost per write. Works with Claude Code.</p>
       <div class="install-box">
         <code id="install-cmd">pip install memwright[all]</code>
         <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install memwright[all]');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)" aria-label="Copy install command">Copy</button>
@@ -35,7 +35,7 @@
       <h2>The Problem</h2>
       <p class="problem-text">AI agents forget everything between conversations. The typical fix is a managed vector database or cloud memory service with high latency and vendor lock-in.</p>
       <h2>The Solution</h2>
-      <p class="problem-text">Memwright gives agents a local memory store with sub-5ms retrieval. A SQLite file for fast keyword search, pgvector for semantic similarity, and Neo4j for entity graph traversal &mdash; fused together with Reciprocal Rank Fusion.</p>
+      <p class="problem-text">Memwright gives agents a local memory store with no LLM cost per write. pgvector for semantic similarity, Neo4j for entity graph traversal, and automatic contradiction detection &mdash; fused together with Reciprocal Rank Fusion.</p>
     </div>
   </section>
 
@@ -46,8 +46,8 @@
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">&#9889;</div>
-          <h3>Sub-5ms Retrieval</h3>
-          <p>4-layer cascade search with RRF fusion. Tag match, FTS5 BM25, graph expansion, and vector similarity &mdash; all in under 5ms.</p>
+          <h3>No LLM Cost Per Write</h3>
+          <p>Competitors call an LLM 3+ times per memory add for extraction and dedup. Memwright uses rule-based extraction &mdash; zero inference cost on writes.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#127919;</div>
@@ -92,22 +92,17 @@
             <div class="arch-layer layer-1">
               <span class="layer-num">1</span>
               <span class="layer-name">Tag Match</span>
-              <span class="layer-detail">&lt;1ms &middot; SQL index</span>
+              <span class="layer-detail">SQL index</span>
             </div>
             <div class="arch-layer layer-2">
               <span class="layer-num">2</span>
-              <span class="layer-name">FTS5 BM25</span>
-              <span class="layer-detail">1-3ms &middot; Full-text</span>
+              <span class="layer-name">Graph Expansion</span>
+              <span class="layer-detail">Neo4j multi-hop</span>
             </div>
             <div class="arch-layer layer-3">
               <span class="layer-num">3</span>
-              <span class="layer-name">Graph Expansion</span>
-              <span class="layer-detail">&lt;1ms &middot; Neo4j</span>
-            </div>
-            <div class="arch-layer layer-4">
-              <span class="layer-num">4</span>
               <span class="layer-name">Vector Similarity</span>
-              <span class="layer-detail">5-10ms &middot; pgvector</span>
+              <span class="layer-detail">pgvector cosine</span>
             </div>
           </div>
           <div class="arch-arrow">&darr;</div>
