@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" fill="none">
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C15F3C"/>
+      <stop offset="100%" stop-color="#E8845C"/>
+    </linearGradient>
+  </defs>
+  <!-- Brain/memory icon -->
+  <g transform="translate(16, 18)">
+    <!-- Outer brain shape -->
+    <path d="M42 8C37 3 30 2 24 4C18 2 11 3 6 8C1 13 0 21 3 27C0 33 1 41 6 46C11 51 18 52 24 50C30 52 37 51 42 46C47 41 48 33 45 27C48 21 47 13 42 8Z" stroke="url(#glow)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Center divide -->
+    <line x1="24" y1="4" x2="24" y2="50" stroke="url(#glow)" stroke-width="2" stroke-dasharray="3 3" opacity="0.5"/>
+    <!-- Neural connection dots -->
+    <circle cx="16" cy="20" r="3" fill="#C15F3C" opacity="0.9"/>
+    <circle cx="32" cy="20" r="3" fill="#C15F3C" opacity="0.9"/>
+    <circle cx="14" cy="34" r="3" fill="#E8845C" opacity="0.8"/>
+    <circle cx="34" cy="34" r="3" fill="#E8845C" opacity="0.8"/>
+    <circle cx="24" cy="27" r="3.5" fill="url(#glow)"/>
+    <!-- Neural connections -->
+    <line x1="16" y1="20" x2="24" y2="27" stroke="#C15F3C" stroke-width="1.5" opacity="0.6"/>
+    <line x1="32" y1="20" x2="24" y2="27" stroke="#C15F3C" stroke-width="1.5" opacity="0.6"/>
+    <line x1="14" y1="34" x2="24" y2="27" stroke="#E8845C" stroke-width="1.5" opacity="0.5"/>
+    <line x1="34" y1="34" x2="24" y2="27" stroke="#E8845C" stroke-width="1.5" opacity="0.5"/>
+    <!-- Small sparkle dots -->
+    <circle cx="10" cy="14" r="1.5" fill="#C15F3C" opacity="0.4"/>
+    <circle cx="38" cy="14" r="1.5" fill="#C15F3C" opacity="0.4"/>
+    <circle cx="8" cy="40" r="1.5" fill="#E8845C" opacity="0.3"/>
+    <circle cx="40" cy="40" r="1.5" fill="#E8845C" opacity="0.3"/>
+  </g>
+  <!-- Text: memwright -->
+  <text x="82" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="52" font-weight="700" letter-spacing="-1">
+    <tspan fill="#C15F3C">mem</tspan><tspan fill="#F4F3EE">wright</tspan>
+  </text>
+</svg>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memwright — Embedded Memory for AI Agents</title>
+  <meta name="description" content="Give your AI agents persistent memory. Sub-5ms retrieval with SQLite FTS5, pgvector, and Neo4j. Works with Claude Code and Cursor.">
+  <meta property="og:title" content="Memwright — Embedded Memory for AI Agents">
+  <meta property="og:description" content="Give your AI agents persistent memory. Sub-5ms retrieval. Works with Claude Code.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bolnet.github.io/agent-memory/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <img src="logo.svg" alt="Memwright" class="hero-logo" width="480" height="120">
+      <p class="tagline">Embedded memory for AI agents. Sub-5ms retrieval. Works with Claude Code.</p>
+      <div class="install-box">
+        <code id="install-cmd">pip install memwright[all]</code>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install memwright[all]');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)" aria-label="Copy install command">Copy</button>
+      </div>
+      <div class="cta-links">
+        <a href="https://github.com/bolnet/agent-memory" class="btn btn-primary">GitHub</a>
+        <a href="https://pypi.org/project/memwright/" class="btn btn-secondary">PyPI</a>
+        <a href="https://registry.modelcontextprotocol.io/servers/io.github.bolnet/memwright" class="btn btn-secondary">MCP Registry</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem / Solution -->
+  <section class="problem">
+    <div class="container">
+      <h2>The Problem</h2>
+      <p class="problem-text">AI agents forget everything between conversations. The typical fix is a managed vector database or cloud memory service with high latency and vendor lock-in.</p>
+      <h2>The Solution</h2>
+      <p class="problem-text">Memwright gives agents a local memory store with sub-5ms retrieval. A SQLite file for fast keyword search, pgvector for semantic similarity, and Neo4j for entity graph traversal &mdash; fused together with Reciprocal Rank Fusion.</p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="container">
+      <h2>Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#9889;</div>
+          <h3>Sub-5ms Retrieval</h3>
+          <p>4-layer cascade search with RRF fusion. Tag match, FTS5 BM25, graph expansion, and vector similarity &mdash; all in under 5ms.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#127919;</div>
+          <h3>Token Efficient</h3>
+          <p>300-500 tokens per recall vs 15,000+ for full history replay. Precise context injection within a configurable token budget.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128260;</div>
+          <h3>Contradiction Handling</h3>
+          <p>New facts automatically supersede old ones. "Works at Google" replaces "Works at SoFi" &mdash; no stale memories.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128300;</div>
+          <h3>Graph-Enhanced</h3>
+          <p>Neo4j entity graph enables multi-hop reasoning. Query "Python" and find related "FastAPI" memories through graph traversal.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128268;</div>
+          <h3>MCP Server</h3>
+          <p>First-class Claude Code and Cursor integration via Model Context Protocol. 7 memory tools out of the box.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128269;</div>
+          <h3>Inspectable</h3>
+          <p>Your data lives in a SQLite file. Run <code>sqlite3 memory.db</code> and see exactly what the agent remembers. No black boxes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="architecture">
+    <div class="container">
+      <h2>How Retrieval Works</h2>
+      <div class="arch-diagram">
+        <div class="arch-flow">
+          <div class="arch-step">
+            <div class="arch-label">Query</div>
+          </div>
+          <div class="arch-arrow">&darr;</div>
+          <div class="arch-layers">
+            <div class="arch-layer layer-1">
+              <span class="layer-num">1</span>
+              <span class="layer-name">Tag Match</span>
+              <span class="layer-detail">&lt;1ms &middot; SQL index</span>
+            </div>
+            <div class="arch-layer layer-2">
+              <span class="layer-num">2</span>
+              <span class="layer-name">FTS5 BM25</span>
+              <span class="layer-detail">1-3ms &middot; Full-text</span>
+            </div>
+            <div class="arch-layer layer-3">
+              <span class="layer-num">3</span>
+              <span class="layer-name">Graph Expansion</span>
+              <span class="layer-detail">&lt;1ms &middot; Neo4j</span>
+            </div>
+            <div class="arch-layer layer-4">
+              <span class="layer-num">4</span>
+              <span class="layer-name">Vector Similarity</span>
+              <span class="layer-detail">5-10ms &middot; pgvector</span>
+            </div>
+          </div>
+          <div class="arch-arrow">&darr;</div>
+          <div class="arch-step">
+            <div class="arch-label">RRF Fusion &rarr; Ranked Results</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start -->
+  <section class="quickstart">
+    <div class="container">
+      <h2>Quick Start</h2>
+      <div class="code-tabs">
+        <div class="code-block">
+          <div class="code-header">Claude Code / Cursor (MCP)</div>
+          <pre><code><span class="comment"># Initialize a memory store</span>
+agent-memory init ~/.agent-memory/my-project
+
+<span class="comment"># Add to your .mcp.json</span>
+{
+  "agent-memory": {
+    "command": "agent-memory",
+    "args": ["serve", "~/.agent-memory/my-project"]
+  }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">Python API</div>
+          <pre><code><span class="kw">from</span> agent_memory <span class="kw">import</span> AgentMemory
+
+mem = AgentMemory(<span class="str">"./my-agent"</span>)
+
+<span class="comment"># Store facts</span>
+mem.add(<span class="str">"User prefers Python over Java"</span>,
+        tags=[<span class="str">"preference"</span>], category=<span class="str">"preference"</span>)
+
+<span class="comment"># Recall relevant memories</span>
+results = mem.recall(<span class="str">"what language?"</span>)
+context = mem.recall_as_context(<span class="str">"user background"</span>)</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integrations -->
+  <section class="integrations">
+    <div class="container">
+      <h2>Integrations</h2>
+      <div class="integration-badges">
+        <div class="integration">
+          <div class="integration-name">Claude Code</div>
+          <div class="integration-desc">MCP server with 7 memory tools</div>
+        </div>
+        <div class="integration">
+          <div class="integration-name">Cursor</div>
+          <div class="integration-desc">Same MCP server, zero config change</div>
+        </div>
+        <div class="integration">
+          <div class="integration-name">Python SDK</div>
+          <div class="integration-desc">Direct API for custom agents</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/bolnet/agent-memory">GitHub</a>
+        <a href="https://pypi.org/project/memwright/">PyPI</a>
+        <a href="https://registry.modelcontextprotocol.io/servers/io.github.bolnet/memwright">MCP Registry</a>
+      </div>
+      <p class="footer-license">Apache 2.0 License</p>
+    </div>
+  </footer>
+</body>
+</html>

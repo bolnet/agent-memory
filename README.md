@@ -1,16 +1,33 @@
-# Memwright
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/logo-dark.svg">
+    <img alt="Memwright" src="docs/logo.svg" width="400">
+  </picture>
+</p>
 
-mcp-name: io.github.bolnet/memwright
+<p align="center">
+  <em>Embedded memory for AI agents. Sub-5ms retrieval. Works with Claude Code.</em>
+</p>
 
-Embedded memory for AI agents. SQLite + pgvector + Neo4j.
+<p align="center">
+  <a href="https://pypi.org/project/memwright/"><img src="https://img.shields.io/pypi/v/memwright?color=C15F3C&style=flat-square" alt="PyPI"></a>
+  <a href="https://pypi.org/project/memwright/"><img src="https://img.shields.io/pypi/pyversions/memwright?style=flat-square" alt="Python"></a>
+  <a href="https://github.com/bolnet/agent-memory/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bolnet/agent-memory?style=flat-square" alt="License"></a>
+  <a href="https://registry.modelcontextprotocol.io/servers/io.github.bolnet/memwright"><img src="https://img.shields.io/badge/MCP-Registry-C15F3C?style=flat-square" alt="MCP Registry"></a>
+</p>
 
-`pip install memwright` — Python import: `from agent_memory import AgentMemory`
+---
 
-## Why
+## Why Memwright?
 
-AI agents forget everything between conversations. The typical fix is a managed vector database or cloud memory service. AgentMemory takes a different approach: a local SQLite file with FTS5 full-text search, zero external dependencies, and sub-5ms retrieval.
+AI agents forget everything between conversations. The typical fix is a managed vector database or cloud memory service. Memwright takes a different approach:
 
-**Works great as a Claude Code MCP server** — give Claude persistent memory.
+- **Local-first** — A SQLite file with FTS5 full-text search. Your data stays on your machine.
+- **Fast** — 4-layer retrieval cascade returns results in under 5ms.
+- **Token efficient** — 300-500 tokens per recall vs 15,000+ for full history replay.
+
+Works as a **Claude Code MCP server**, a **Cursor MCP server**, or a **Python library**.
 
 ## Install
 
@@ -19,41 +36,38 @@ pip install memwright[all]      # Recommended — includes pgvector, Neo4j, MCP
 pip install memwright           # Core only (SQLite + FTS5)
 pip install memwright[vectors]  # + pgvector semantic search
 pip install memwright[neo4j]    # + Neo4j graph database
-pip install memwright[mcp]      # + MCP server for Claude Code
+pip install memwright[mcp]      # + MCP server for Claude Code / Cursor
 ```
 
-**Requirements:**
-- Docker (for PostgreSQL + Neo4j): `docker compose up -d`
-- Embedding API key: `OPENROUTER_API_KEY` or `OPENAI_API_KEY`
+**Requirements:** Docker (for PostgreSQL + Neo4j) and an embedding API key (`OPENROUTER_API_KEY` or `OPENAI_API_KEY`).
 
-## Quick Start — Claude Code MCP Server
+## Quick Start — MCP Server (Claude Code / Cursor)
 
 ```bash
-# 1. Initialize a memory store
+# 1. Initialize (starts Docker containers, generates .env)
 agent-memory init ~/.agent-memory/my-project
 
-# 2. Get the MCP config
+# 2. Get MCP config
 agent-memory setup-claude-code ~/.agent-memory/my-project
 ```
 
-Add the output to your project's `.mcp.json`:
+Add the output to your `.mcp.json`:
 
 ```json
 {
   "agent-memory": {
     "command": "agent-memory",
-    "args": ["serve", "/Users/you/.agent-memory/my-project", "--mcp"]
+    "args": ["serve", "~/.agent-memory/my-project"]
   }
 }
 ```
 
-Claude now has 6 memory tools: `memory_add`, `memory_recall`, `memory_search`, `memory_forget`, `memory_timeline`, `memory_stats`.
+Claude now has 7 memory tools: `memory_add`, `memory_get`, `memory_recall`, `memory_search`, `memory_forget`, `memory_timeline`, `memory_stats`.
 
-Add instructions to your `CLAUDE.md` (see `examples/CLAUDE.md.example`):
+Add to your `CLAUDE.md`:
 
 ```markdown
 ## Memory
-
 Use `memory_recall` at the start of each conversation with the user's first message.
 Use `memory_add` to store preferences, decisions, and project context.
 ```
@@ -71,7 +85,7 @@ mem.add("User prefers Python over Java",
 mem.add("User works at SoFi as Staff SWE",
         tags=["career"], category="career", entity="SoFi")
 
-# Recall relevant memories (multi-layer cascade: tags, FTS5, optional vectors + graph)
+# Recall relevant memories
 results = mem.recall("what language does the user prefer?")
 for r in results:
     print(f"[{r.match_source}:{r.score:.2f}] {r.content}")
@@ -85,42 +99,66 @@ mem.add("User works at Google as Principal Eng",
 # ^ The SoFi memory is now superseded automatically
 ```
 
-## CLI
-
-```bash
-agent-memory init ./store
-agent-memory add ./store "User prefers dark mode" --tags preference --category preference
-agent-memory recall ./store "what theme?"
-agent-memory search ./store "Python" --category preference
-agent-memory list ./store --status active
-agent-memory timeline ./store --entity SoFi
-agent-memory stats ./store
-agent-memory export ./store -o backup.json
-agent-memory import ./store backup.json
-agent-memory forget ./store <memory-id>
-agent-memory compact ./store
-agent-memory inspect ./store
-agent-memory serve ./store --mcp
-```
-
 ## How Retrieval Works
 
 Multi-layer cascade with Reciprocal Rank Fusion:
 
-| Layer | Method | Speed | Always On |
-|-------|--------|-------|-----------|
-| 1. Tag match | SQL index lookup | <1ms | Yes |
-| 2. FTS5 BM25 | SQLite full-text search | 1-3ms | Yes |
-| 3. Graph expansion | Neo4j multi-hop entity traversal | <1ms | Yes |
-| 4. Vector similarity | pgvector cosine similarity | 5-10ms | Yes |
+```mermaid
+graph TD
+    Q["Query"] --> T["1. Tag Match<br/><small>&lt;1ms · SQL index</small>"]
+    Q --> F["2. FTS5 BM25<br/><small>1-3ms · Full-text</small>"]
+    Q --> G["3. Graph Expansion<br/><small>&lt;1ms · Neo4j multi-hop</small>"]
+    Q --> V["4. Vector Similarity<br/><small>5-10ms · pgvector cosine</small>"]
+    T --> R["RRF Fusion + Ranking"]
+    F --> R
+    G --> R
+    V --> R
+    R --> O["Ranked Results<br/><small>within token budget</small>"]
 
-Results from all layers are fused using Reciprocal Rank Fusion (RRF), boosted by recency and entity relevance, deduplicated, then assembled within a token budget.
+    style Q fill:#C15F3C,stroke:#C15F3C,color:#fff
+    style R fill:#C15F3C,stroke:#C15F3C,color:#fff
+    style O fill:#161b22,stroke:#C15F3C,color:#F4F3EE
+    style T fill:#161b22,stroke:#30363d,color:#F4F3EE
+    style F fill:#161b22,stroke:#30363d,color:#F4F3EE
+    style G fill:#161b22,stroke:#30363d,color:#F4F3EE
+    style V fill:#161b22,stroke:#30363d,color:#F4F3EE
+```
 
-When the graph is enabled, entity relationships are traversed to find related memories (e.g., querying "Python" also finds memories about "FastAPI" if they're connected in the graph). Graph relationship triples are injected as synthetic context for multi-hop reasoning.
+When the graph is enabled, entity relationships are traversed to find related memories (e.g., querying "Python" also finds memories about "FastAPI" if they're connected). Graph relationship triples are injected as synthetic context for multi-hop reasoning.
+
+## CLI
+
+```bash
+agent-memory init ./store              # Initialize store + Docker + .env
+agent-memory add ./store "text" ...    # Add a memory
+agent-memory recall ./store "query"    # Multi-layer recall
+agent-memory search ./store "text"     # FTS5 search
+agent-memory list ./store              # List memories
+agent-memory timeline ./store          # Entity timeline
+agent-memory stats ./store             # Store statistics
+agent-memory doctor ./store            # Health check
+agent-memory serve ./store             # Start MCP server
+agent-memory export ./store -o bak.json
+agent-memory import ./store bak.json
+```
+
+## Architecture
+
+```
+AgentMemory
+├── SQLite + FTS5    — Core keyword search, always on
+├── pgvector         — Semantic vector search (PostgreSQL)
+├── Neo4j            — Entity graph, multi-hop traversal
+├── Retrieval        — 4-layer cascade with RRF fusion
+├── Temporal         — Contradiction detection, supersession
+├── Extraction       — Rule-based + optional LLM
+├── MCP Server       — Claude Code / Cursor integration
+└── CLI + Doctor     — Health check for all components
+```
 
 ## Configuration
 
-AgentMemory stores a `config.json` in the memory store directory. Options:
+AgentMemory stores `config.json` in the memory store directory:
 
 ```json
 {
@@ -128,37 +166,16 @@ AgentMemory stores a `config.json` in the memory store directory. Options:
   "min_results": 3,
   "pg_connection_string": "postgresql://memwright:memwright@localhost:5432/memwright",
   "neo4j_uri": "bolt://localhost:7687",
-  "neo4j_user": "neo4j",
-  "neo4j_password": "memwright",
-  "neo4j_database": "neo4j"
+  "neo4j_password": "memwright"
 }
 ```
 
-## Key Features
-
-- **Sub-5ms retrieval** — Fast multi-layer cascade with RRF fusion.
-- **Token efficient** — 300-500 tokens per recall vs 15,000+ for full history replay.
-- **Automatic contradiction handling** — New facts supersede old ones (same entity + category).
-- **Graph-enhanced** — Neo4j entity graph enables multi-hop reasoning.
-- **Semantic search** — pgvector cosine similarity over OpenAI embeddings.
-- **Inspectable** — `sqlite3 memory.db` and see exactly what the agent remembers.
-- **MCP server** — First-class Claude Code / Claude Desktop integration.
-- **Health check** — `agent-memory doctor` verifies all components.
-
-## Architecture
-
-```
-AgentMemory
-├── SQLite + FTS5 store (core keyword search)
-├── pgvector (semantic vector search)
-├── Neo4j (entity graph, multi-hop traversal)
-├── Multi-layer retrieval (tag → BM25 → graph → vector) with RRF fusion
-├── Temporal logic (contradiction detection, supersession, timeline)
-├── Extraction pipeline (rule-based default, optional LLM)
-├── MCP server (for Claude Code)
-└── CLI + Health check
-```
+Environment variables override config: `PG_CONNECTION_STRING`, `NEO4J_PASSWORD`, `OPENROUTER_API_KEY` / `OPENAI_API_KEY`.
 
 ## License
 
 Apache 2.0
+
+---
+
+<sub>mcp-name: io.github.bolnet/memwright</sub>
